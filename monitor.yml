@@ -1,0 +1,41 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-4.0.2 | and modified by codesenju
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: monitor
+  name: monitor
+spec:
+  containers:
+  - name: grafana1
+    image: docker.io/grafana/grafana:8.4.4
+  - name: grafana2
+    image: docker.io/grafana/grafana:8.4.4
+  - name: grafana-proxy
+    ports:
+    - containerPort: 80
+      hostPort: 4000
+    args:
+    - nginx
+    - -g
+    - daemon off;
+    image: docker.io/library/nginx:alpine
+  - name: postgress
+    env:
+    - name: POSTGRES_PASSWORD
+      value: postgres123
+    - name: POSTGRES_USER
+      value: postgres
+    image: docker.io/library/postgres:12-alpine
+    volumeMounts:
+    - mountPath: /var/lib/postgresql/data
+      name: db-data-pvc
+  restartPolicy: Never
+  volumes:
+  - name: db-data-pvc
+    persistentVolumeClaim:
+      claimName: db-data-claim
+restartPolicy: unless-stopped
