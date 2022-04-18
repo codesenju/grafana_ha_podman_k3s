@@ -1,4 +1,5 @@
-podman pod rm -f monitor
+podman play kube --down monitor.yml
+podman volume rm -f db-data-claim
 echo "Creating new pod 'monitor'..."
 podman play kube monitor.yml 
 echo "Copying configuration files..."
