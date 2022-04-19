@@ -39,3 +39,5 @@ k3d cluster delete cloud-native
 - https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/
 - https://www.redhat.com/sysadmin/podman-docker-compose
 - https://github.com/nginxinc/docker-nginx/issues/422
+- https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-config-file/
+- https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables

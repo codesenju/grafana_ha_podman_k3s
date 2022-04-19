@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-deploy
+spec:
+  selector:
+    matchLabels:
+      app: keycloak-deploy
+  template:
+    metadata:
+      labels:
+        app: keycloak-deploy
+    spec:
+      containers:
+      - name: keycloak-deploy
+        image: quay.io/keycloak/keycloak:17.0.1
+        args:
+        - start
+        - --auto-build
+        - --hostname=localhost
+        - --https-certificate-file=/certs/cert.pem
+        - --https-certificate-key-file=/certs/key.pem
+        - --spi-theme-static-max-age=-1
+        - --spi-theme-cache-themes=false
+        - --spi-theme-cache-templates=false
+        env:
+        - name: KC_DB
+          value: postgres
+        - name: KC_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-password
+              key: password
+        - name: KC_DB_URL_DATABASE
+          value: postgres
+        - name: KC_DB_URL_HOST
+          value:  postgres-svc
+        - name: KC_DB_USERNAME
+          value: postgres
+        - name: KC_HOSTNAME_STRICT_HTTPS
+          value: "false"
+        - name: KEYCLOAK_ADMIN
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-admin-password
+              key: username
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-admin-password
+              key: password
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+        - name: keycloak-certs-vlm
+          mountPath: "/certs"
+          readOnly: true
+      volumes:
+      - name: keycloak-certs-vlm
+        configMap:
+          name: keycloak-certs
+          items:
+            - key: cert.pem
+              path: cert.pem
+            - key: key.pem
+              path: key.pem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-svc
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https
+spec:
+  selector:
+    app: keycloak-deploy
+  ports:
+  - port: 80
+    targetPort: 8443

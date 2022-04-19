@@ -23,6 +23,10 @@ spec:
         - name: grafana-config
           mountPath: "/etc/grafana/"
           readOnly: true
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
       volumes:
       - name: grafana-config
         configMap:

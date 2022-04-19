@@ -18,6 +18,6 @@ kubectl apply -f ingress.yml
 sleep 4
 kubectl get ingress/nginx
 echo "Almost done.."
-sleep 10
+sleep 15
 kubectl get pods
 echo "Done!"
