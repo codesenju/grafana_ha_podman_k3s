@@ -28,6 +28,10 @@ kubectl cluster-info
 ```
  ./kube-setup.sh 
 ```
+## Delete cluster
+```
+k3d cluster delete cloud-native
+```
 
 # Rreferences:
 - https://k3d.io/v5.4.1/usage/exposing_services/
