@@ -35,3 +35,7 @@ k3d cluster delete cloud-native
 
 # Rreferences:
 - https://k3d.io/v5.4.1/usage/exposing_services/
+- https://kubernetes.io/docs/concepts/services-networking/service/
+- https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/
+- https://www.redhat.com/sysadmin/podman-docker-compose
+- https://github.com/nginxinc/docker-nginx/issues/422
