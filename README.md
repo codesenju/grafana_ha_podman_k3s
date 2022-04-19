@@ -6,7 +6,7 @@
 ```
 OR
 ```bash
-podman play kube grafana-server-pod.yml 
+podman play kube monitor.yml 
 podman cp grafana.conf  monitor-grafana-proxy:/etc/nginx/nginx.conf
 podman cp grafana1.ini monitor-grafana1:/etc/grafana/grafana.ini    
 podman cp grafana2.ini monitor-grafana2:/etc/grafana/grafana.ini
