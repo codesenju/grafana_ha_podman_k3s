@@ -3,7 +3,7 @@
 #
 # Created with podman-4.0.2 | and modified by codesenju
 apiVersion: v1
-kind: Pod
+kind: Deployment
 metadata:
   labels:
     app: monitor

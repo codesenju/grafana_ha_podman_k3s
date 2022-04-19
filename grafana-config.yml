@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+data: 
+ grafana.ini: |
+    # instance name, defaults to HOSTNAME environment variable value or hostname if HOSTNAME var is empty
+    instance_name = ${HOSTNAME}
+    
+    [server]
+    http_port = 3000
+    [smtp]
+    ;enabled = false
+    ;host = <host>:25
+    ;user = Grafanaxw
+    ;# If the password contains # or ; you have to wrap it with triple quotes. Ex """#password;"""
+    ;password =
+    ;cert_file =
+    ;key_file =
+    ;skip_verify = true
+    ;from_address = admin@grafana-container.com
+    ;from_name = Grafana
+    ;# EHLO identity in SMTP dialog (defaults to instance_name)
+    ;;ehlo_identity = dashboard.example.com
+    ;# SMTP startTLS policy (defaults to 'OpportunisticStartTLS')
+    ;;startTLS_policy = NoStartTLS
+
+    [database]
+    ; url = postgres://<USER>:<PASSWORD>@<HOSTNAME>:5432/<DATABASE>
+    url = postgres://postgres:postgres123@postgres-svc:5432/postgres
+    [users]
+    # disable user signup / registration
+    allow_sign_up = false
+    [security]
+    # disable creation of admin user on first start of grafana
+    ;disable_initial_admin_creation = false
+
+    ;# default admin user, created on startup
+    admin_user = admin
+    ;# default admin password, can be changed before first start of grafana,  or in profile settings
+    admin_password = admin123
+
+    [auth.generic_oauth]
+    enabled = false
+    scopes = profile
+    name = Keycloak
+    tls_skip_verify_insecure = true
+    allow_sign_up = true
+    client_id = grafana
+    client_secret = thisisasecretforgrafanaclient
+    auth_url = https://localhost:8443/realms/demo/protocol/openid-connect/auth
+    token_url = https://localhost:8443/realms/demo/protocol/openid-connect/token
+    api_url = https://localhost:8443/realms/demo/protocol/openid-connect/userinfo
+    role_attribute_path = contains(resource_access.grafana.roles[*], 'grafana_admin') && 'Admin' || contains(resource_access.grafana.roles[*], 'grafana_editor') && 'Editor' || 'Viewer'
+    ; It denies user access if no role or an invalid role is returned.
+    ; role_attribute_strict = true
+    [log]
+    filters = oauth:debug oauth.generic_oauth:debug

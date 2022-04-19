@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-proxy-deployment
+  labels:
+    app: grafana-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-proxy
+  template:
+    metadata:
+      labels:
+        app: grafana-proxy
+    spec:
+      containers:
+      - name: grafana-proxy
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: grafana-proxy-config
+          mountPath: "/etc/nginx/"
+          readOnly: true
+      volumes:
+      - name: grafana-proxy-config
+        configMap:
+          name: grafana-proxy-config # place ConfigMap `nginx-conf` on /etc/nginx
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-proxy-svc
+spec:
+  selector:
+    app: grafana-proxy
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
