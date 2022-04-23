@@ -15,11 +15,11 @@ spec:
       - name: keycloak-deploy
         image: quay.io/keycloak/keycloak:17.0.1
         args:
-        - start
+        - start-dev
         - --auto-build
         - --hostname=localhost
-        - --https-certificate-file=/certs/cert.pem
-        - --https-certificate-key-file=/certs/key.pem
+        - --https-certificate-file=/certs/tls.crt
+        - --https-certificate-key-file=/certs/tls.key
         - --spi-theme-static-max-age=-1
         - --spi-theme-cache-themes=false
         - --spi-theme-cache-templates=false
@@ -49,35 +49,34 @@ spec:
             secretKeyRef:
               name: keycloak-admin-password
               key: password
+        - name: PROXY_ADDRESS_FORWARDING
+          value: "true"
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
-        - containerPort: 8443
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
         volumeMounts:
         - name: keycloak-certs-vlm
           mountPath: "/certs"
           readOnly: true
       volumes:
       - name: keycloak-certs-vlm
-        configMap:
-          name: keycloak-certs
-          items:
-            - key: cert.pem
-              path: cert.pem
-            - key: key.pem
-              path: key.pem
+        secret:
+          secretName: keycloak-ssl-certs
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: keycloak-svc
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https
 spec:
   selector:
     app: keycloak-deploy
   ports:
-  - port: 80
-    targetPort: 8443
+    - name: https
+      port: 80
+      targetPort: 8443

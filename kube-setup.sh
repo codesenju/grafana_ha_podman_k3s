@@ -3,8 +3,8 @@ kubectl apply -f nginx-config.yml
 echo "Gettig config files ready..."
 sleep 2
 kubectl get configmaps
-# kubectl describe configmaps/grafana-config
-# kubectl describe configmaps/grafana-proxy-config
+echo "Prepare keys..."
+kubectl describe secret/keycloak-ssl-certs
 echo "Creating deployemnts - postgres-deployment, grafana-deployment.yml, nginx-deployment.yml..."
 kubectl apply -f postgres-deployment.yml
 kubectl apply -f grafana-deployment.yml
