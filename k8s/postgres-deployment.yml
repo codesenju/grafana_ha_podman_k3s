@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-deployment
+  name: postgres
+  namespace: cloud
   labels:
     app: postgres
 spec:
@@ -19,16 +20,28 @@ spec:
         image: postgres:12-alpine
         ports:
         - containerPort: 5432
+          name: http
         env:
           - name: POSTGRES_PASSWORD
-            value: postgres123
+            valueFrom:
+              secretKeyRef:
+                name: postgres-password
+                key: password
           - name: POSTGRES_USER
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                name: postgres-password
+                key: username
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-svc
+  name: postgres
+  namespace: cloud
 spec:
   selector:
     app: postgres
@@ -36,3 +49,4 @@ spec:
     - protocol: TCP
       port: 5432
       targetPort: 5432
+  type: LoadBalancer

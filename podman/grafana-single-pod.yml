@@ -12,8 +12,16 @@ spec:
   containers:
   - name: grafana1
     image: docker.io/grafana/grafana:8.4.4
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
   - name: grafana2
     image: docker.io/grafana/grafana:8.4.4
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
   - name: proxy
     ports:
     - containerPort: 80
@@ -23,6 +31,10 @@ spec:
     - -g
     - daemon off;
     image: docker.io/library/nginx:alpine
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
   - name: postgress
     env:
     - name: POSTGRES_PASSWORD
@@ -33,6 +45,10 @@ spec:
     volumeMounts:
     - mountPath: /var/lib/postgresql/data
       name: db-data-pvc
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
   restartPolicy: Never
   volumes:
   - name: db-data-pvc
