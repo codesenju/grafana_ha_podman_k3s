@@ -14,6 +14,9 @@ kubectl get svc/grafana
 kubectl apply -f ingress.yml
 sleep 5
 echo "Waiting for pods to be ready..."
-sleep 10
-echo "Done!"
+sleep 12
+echo "Almost done.."
+sleep 8
+kubectl get pods
 kubectl describe ing/nginx
+echo "Done!"

@@ -45,7 +45,7 @@ kubectl get svc/grafana
 kubectl apply -f ingress.yml 
 echo  '127.0.0.1  grafana.example.com' >  /etc/hosts/
 ```
-Go to [localhost:8080](http://localhost:8080)
+Go to [grafana-example.com:8080](http://grafana.example.com:8080)
 
 ## Delete cluster
 ```
