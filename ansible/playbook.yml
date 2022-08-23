@@ -1,0 +1,26 @@
+---
+- name: manage k3s Pods
+  hosts: localhost
+  gather_facts:  false
+  vars_files:
+    - credentials.yml
+    - vars.yml
+  tasks:
+    - name: Create or update Keycloak realm | demo
+      community.general.keycloak_realm:
+        auth_client_id: admin-cli
+        auth_keycloak_url: "{{ keycloak_url }}"
+        auth_realm: master
+        auth_username: "{{ k_user }}"
+        auth_password: "{{ k_password }}"
+        id: demo
+        realm: demo
+        state: present
+        enabled: true
+        validate_certs: no
+
+    - name: Configure keycloak grafana client
+      import_tasks: keycloak_grafana.yml
+      when: _state == "present"
+      tags:
+        - grafana-client

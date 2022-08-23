@@ -1,13 +1,34 @@
+# apiVersion: networking.k8s.io/v1beta1 # for k3s < v1.19
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nginx
   annotations:
-     ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/ssl-redirect: "false"
+#    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+#    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
-#  tls:
-#    - secretName: keycloak-ssl-certs
   rules:
+   - host: keycloak.example.com
+     http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: my-keycloak-http
+            port:
+              number: 80
+   - host: nginx.example.com
+     http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-server
+            port:
+              number: 80
    - host: grafana.example.com
      http:
       paths:
@@ -17,4 +38,4 @@ spec:
           service:
             name: grafana
             port:
-              number: 80
+              number: 81

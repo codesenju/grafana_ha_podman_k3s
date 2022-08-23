@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: keycloak-deploy
+  name: keycloak
 spec:
   selector:
     matchLabels:
-      app: keycloak-deploy
+      app: keycloak
   template:
     metadata:
       labels:
-        app: keycloak-deploy
+        app: keycloak
     spec:
       containers:
-      - name: keycloak-deploy
+      - name: keycloak
         image: quay.io/keycloak/keycloak:17.0.1
         args:
-        - start-dev
+        - start
         - --auto-build
         - --hostname=localhost
         - --https-certificate-file=/certs/tls.crt
@@ -24,6 +24,8 @@ spec:
         - --spi-theme-cache-themes=false
         - --spi-theme-cache-templates=false
         env:
+        - name: KC_PROXY
+          value: passthrough
         - name: KC_DB
           value: postgres
         - name: KC_DB_PASSWORD
@@ -34,7 +36,7 @@ spec:
         - name: KC_DB_URL_DATABASE
           value: postgres
         - name: KC_DB_URL_HOST
-          value:  postgres-svc
+          value:  postgres
         - name: KC_DB_USERNAME
           value: postgres
         - name: KC_HOSTNAME_STRICT_HTTPS
@@ -67,15 +69,15 @@ spec:
       volumes:
       - name: keycloak-certs-vlm
         secret:
-          secretName: keycloak-ssl-certs
+          secretName: ssl-certs
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: keycloak-svc
+  name: keycloak
 spec:
   selector:
-    app: keycloak-deploy
+    app: keycloak
   ports:
     - name: https
       port: 80

@@ -1,0 +1,128 @@
+- name: Create Keycloak client | grafana
+  keycloak_client:
+    auth_keycloak_url: "{{ keycloak_url }}"
+    auth_realm: master
+    auth_username:  "{{ k_user }}"
+    auth_password:  "{{ k_password }}"
+    realm: demo
+    client_id: grafana
+    state: "{{ keycloak_config_state }}"
+    description: Updated by ansible
+    root_url:  http://grafana.example.com:8080
+    admin_url: http://grafana.example.com:8080
+    base_url: "/"
+    enabled: True
+    client_authenticator_type: client-secret
+    secret: thisisasecretforgrafanaclient
+    redirect_uris:
+      -  http://grafana.example.com:8080/*
+    validate_certs: no
+  delegate_to: localhost
+  #       register: output
+  #    - debug:
+  #        var: output
+
+- name: Create a Keycloak client role | grafana_admin
+  community.general.keycloak_role:
+    name: grafana_admin
+    realm: demo
+    client_id: grafana
+    state: "{{ keycloak_config_state }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: "{{ keycloak_url }}"
+    auth_realm: master
+    auth_username: "{{ k_user }}"
+    auth_password: "{{ k_password }}"
+    validate_certs: no
+
+- name: Create a Keycloak client role | grafana_editor
+  community.general.keycloak_role:
+    name: grafana_editor
+    realm: demo
+    client_id: grafana
+    state: "{{ keycloak_config_state }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: "{{ keycloak_url }}"
+    auth_realm: master
+    auth_username: "{{ k_user }}"
+    auth_password: "{{ k_password }}"
+    validate_certs: no
+
+- name: Create a Keycloak group | grafana_admins
+  keycloak_group:
+    name: grafana_admins
+    realm: demo
+    state: "{{ keycloak_config_state }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: "{{ keycloak_url }}"
+    auth_realm: master
+    auth_username: "{{ k_user }}"
+    auth_password: "{{ k_password }}"
+    validate_certs: no
+
+- name: Create a Keycloak group | grafana_editors
+  keycloak_group:
+    name: grafana_editors
+    realm: demo
+    state: "{{ keycloak_config_state }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: "{{ keycloak_url }}"
+    auth_realm: master
+    auth_username: "{{ k_user }}"
+    auth_password: "{{ k_password }}"
+    validate_certs: no
+
+- name: Map a client role to a group | grafana_admin client role = grafana_admins group
+  community.general.keycloak_client_rolemapping:
+    realm: demo
+    auth_client_id: admin-cli
+    auth_keycloak_url: "{{ keycloak_url }}"
+    auth_realm: master
+    auth_username: "{{ k_user }}"
+    auth_password: "{{ k_password }}"
+    validate_certs: no
+    state: "{{ keycloak_config_state }}"
+    client_id: grafana
+    group_name: grafana_admins
+    roles:
+      - name: grafana_admin
+
+- name: Map a client role to a group | grafana_editor client role = grafana_editors group
+  community.general.keycloak_client_rolemapping:
+    realm: demo
+    auth_client_id: admin-cli
+    auth_keycloak_url: "{{ keycloak_url }}"
+    auth_realm: master
+    auth_username: "{{ k_user }}"
+    auth_password: "{{ k_password }}"
+    validate_certs: no
+    state: "{{ keycloak_config_state }}"
+    client_id: grafana
+    group_name: grafana_editors
+    roles:
+      - name: grafana_editor
+
+- name: Update a Keycloak client_scope with some custom attributes
+  community.general.keycloak_clientscope:
+    name: roles
+    auth_client_id: admin-cli
+    auth_keycloak_url: "{{ keycloak_url }}"
+    auth_realm: master
+    auth_username: "{{ k_user }}"
+    auth_password: "{{ k_password }}"
+    validate_certs: no
+    state: "{{ keycloak_config_state }}"
+    description: Updated by ansible
+    protocol: openid-connect
+    realm: demo
+    protocol_mappers:
+      - config:
+          access.token.claim: True
+          claim.name: "resource_access.${client_id}.roles"
+          id.token.claim: True
+          jsonType.label: String
+          userinfo.token.claim: True
+          multivalued: true
+        name: client roles
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-client-role-mapper
